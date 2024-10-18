@@ -1,6 +1,5 @@
 package com.example.littlelemon.ui
 
-import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,15 +21,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -42,19 +39,9 @@ import com.example.littlelemon.ui.theme.MarkaziText
 import com.example.littlelemon.ui.theme.PrimaryColor1
 import com.example.littlelemon.ui.theme.PrimaryColor2
 
-@Composable
-fun ToDp(value: Int): Dp {
-    return LocalDensity.current.run { value.toDp() }
-}
-
-fun CharSequence?.isValidEmail() = !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Onboarding(navController: NavHostController?, onRegister: (firstName: String, lastName: String, email: String) -> Unit) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+fun Profile(navController: NavHostController?, firstName: String, lastName: String, email: String, onLogout : () -> Unit) {
     val context = LocalContext.current
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -62,21 +49,9 @@ fun Onboarding(navController: NavHostController?, onRegister: (firstName: String
             painterResource(id = R.drawable.little_lemon_logo),
             "Little Lemon Logo",
             modifier = Modifier
-                .align(CenterHorizontally)
+                .align(Alignment.CenterHorizontally)
                 .width(179.dp)
                 .height(56.dp)
-        )
-
-        Text(
-            "Let's get to know you",
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(PrimaryColor1)
-                .padding(top = 20.dp, bottom = 20.dp),
-            textAlign = TextAlign.Center,
-            fontSize = 20.sp,
-            fontFamily = Karla,
-            color = HighlightColor1
         )
 
         Text(
@@ -95,19 +70,22 @@ fun Onboarding(navController: NavHostController?, onRegister: (firstName: String
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = firstName,
-                onValueChange = { firstName = it },
+                onValueChange = { },
+                enabled = false,
                 label = { Text("First name") }
             )
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = lastName,
-                onValueChange = { lastName = it },
+                onValueChange = { },
+                enabled = false,
                 label = { Text("Last name") }
             )
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { },
+                enabled = false,
                 label = { Text("Email") }
             )
         }
@@ -116,14 +94,8 @@ fun Onboarding(navController: NavHostController?, onRegister: (firstName: String
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    if (firstName.isNotEmpty() && lastName.isNotEmpty() && email.isValidEmail()) {
-                        onRegister(firstName, lastName, email)
-                        Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show()
-
-                        navController?.navigate(Home.route)
-                    } else {
-                        Toast.makeText(context, "Registration unsuccessful. Please enter all data.", Toast.LENGTH_SHORT).show()
-                    }
+                    onLogout()
+                    navController?.navigate(Onboarding.route)
                 },
                 shape = RoundedCornerShape(30),
                 colors = ButtonDefaults.buttonColors(
@@ -131,7 +103,7 @@ fun Onboarding(navController: NavHostController?, onRegister: (firstName: String
                     contentColor = HighlightColor2
                 )
             ) {
-                Text("Register")
+                Text("Log out")
             }
         }
 
@@ -140,8 +112,6 @@ fun Onboarding(navController: NavHostController?, onRegister: (firstName: String
 
 @Preview(showBackground = true)
 @Composable
-fun OnboardingPreview() {
-    Onboarding(null) { _, _, _ ->
-
-    }
+fun ProfilePreview() {
+    Profile(null,"First", "Last", "hi@gmail.com") {}
 }

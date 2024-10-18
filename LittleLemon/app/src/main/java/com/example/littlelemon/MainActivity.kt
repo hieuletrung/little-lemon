@@ -10,7 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.littlelemon.ui.Home
 import com.example.littlelemon.ui.Onboarding
+import com.example.littlelemon.ui.Profile
 import com.example.littlelemon.ui.theme.LittleLemonTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,6 +23,8 @@ class MainActivity : ComponentActivity() {
     private val sharedPreferences by lazy {
         getSharedPreferences("LittleLemon", MODE_PRIVATE)
     }
+
+    fun isUserDataPresent() = sharedPreferences.contains("email")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,13 +35,40 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Onboarding { firstName, lastName, email ->
-                        sharedPreferences.edit().apply() {
-                            putString("firstName", firstName)
-                            putString("lastName", lastName)
-                            putString("email", email)
-                        }.apply()
+                    val navController = rememberNavController()
+
+                    NavHost(
+                        navController = navController,
+                        startDestination = if (isUserDataPresent()) Home.route else Onboarding.route
+                    ) {
+                        composable(Onboarding.route) {
+                            Onboarding(navController = navController, onRegister = { firstName, lastName, email ->
+                                sharedPreferences.edit().apply {
+                                    putString("firstName", firstName)
+                                    putString("lastName", lastName)
+                                    putString("email", email)
+                                }.apply()
+                            })
+                        }
+                        composable(Home.route) {
+                            Home()
+                        }
+                        composable(Profile.route) {
+                            val firstName = sharedPreferences.getString("firstName", "") ?: ""
+                            val lastName = sharedPreferences.getString("lastName", "") ?: ""
+                            val email = sharedPreferences.getString("email", "") ?: ""
+                            Profile(navController, firstName, lastName, email) {
+                                sharedPreferences.edit().apply {
+                                    remove("firstName")
+                                    remove("lastName")
+                                    remove("email")
+                                }.apply()
+                            }
+                        }
+
+
                     }
+
                 }
             }
         }
