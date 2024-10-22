@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -68,21 +71,21 @@ fun Home() {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier
             .fillMaxWidth()
-            .height(96.dp)) {
+            .height(96.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+            Spacer(modifier = Modifier.weight(1f))
             Image(
                 painterResource(id = R.drawable.little_lemon_logo),
                 "Little Lemon Logo",
                 modifier = Modifier
-                    .align(Alignment.CenterVertically)
                     .width(179.dp)
                     .height(56.dp)
             )
-
+            Spacer(modifier = Modifier.weight(1f))
             Image(
                 painterResource(id = R.drawable.profile),
                 "Profile Picture",
                 modifier = Modifier
-                    .align(Alignment.CenterVertically)
                     .width(50.dp)
                     .height(47.dp)
             )
@@ -147,12 +150,7 @@ fun Home() {
                 value = "",
                 onValueChange = { /*searchPhrase = it*/ },
                 label = { Text("Enter Search Phrase") },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.search_icon),
-                        contentDescription = "Search Icon"
-                    )
-                },
+                leadingIcon = { Icon( imageVector = Icons.Default.Search, contentDescription = "") },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     containerColor = HighlightColor1,
                     focusedLabelColor = HighlightColor1,
