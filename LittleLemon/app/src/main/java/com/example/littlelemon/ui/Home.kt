@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,6 +63,7 @@ import com.example.littlelemon.ui.theme.Karla
 import com.example.littlelemon.ui.theme.MarkaziText
 import com.example.littlelemon.ui.theme.PrimaryColor1
 import com.example.littlelemon.ui.theme.PrimaryColor2
+import com.example.littlelemon.ui.theme.SecondaryColor1
 
 val LocalDynamicDatabase = compositionLocalOf<MenuDatabase?> {
     null
@@ -68,6 +72,9 @@ val LocalDynamicDatabase = compositionLocalOf<MenuDatabase?> {
 @Composable
 fun Home() {
     val database = LocalDynamicDatabase.current
+    var searchPhrase by remember { mutableStateOf("") }
+    var filterCategory by remember { mutableStateOf("") }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -147,8 +154,8 @@ fun Home() {
             }
 
             OutlinedTextField(
-                value = "",
-                onValueChange = { /*searchPhrase = it*/ },
+                value = searchPhrase,
+                onValueChange = { searchPhrase = it },
                 label = { Text("Enter Search Phrase") },
                 leadingIcon = { Icon( imageVector = Icons.Default.Search, contentDescription = "") },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -170,6 +177,46 @@ fun Home() {
         var menuItems = (if (orderMenuItems) {
                             databaseMenuItems?.value?.sortedBy { it.title }
                         } else databaseMenuItems?.value) ?: emptyList()
+        val menuCategories = menuItems.map { it.category }.toSet().toList()
+        menuItems = if (searchPhrase.isNotEmpty()) {
+            menuItems.filter { it.title.contains(searchPhrase) }
+        } else { menuItems }
+
+        menuItems = if (filterCategory.isNotEmpty()) {
+            menuItems.filter { it.category == filterCategory }
+        } else { menuItems }
+
+        Column(modifier = Modifier.padding(start =10.dp, end=10.dp,top=20.dp)) {
+            Text("ORDER FOR DELIVERY!",
+                fontFamily = MarkaziText,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                color = HighlightColor2)
+            LazyRow() {
+                items(
+                    items = menuCategories,
+                    itemContent =  {
+                        Button(
+                            onClick = {
+                                filterCategory = if (filterCategory == it) {
+                                                    ""
+                                                } else {
+                                                    it
+                                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (filterCategory == it) SecondaryColor1 else HighlightColor1,
+                                contentColor = PrimaryColor1
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .padding(10.dp)
+                        ) {
+                            Text(it)
+                        }
+                })
+            }
+        }
 
         MenuItems(items = menuItems)
     }
